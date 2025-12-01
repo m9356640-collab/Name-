@@ -135,23 +135,21 @@ module.exports = {
  "𝐂𝐚𝐫𝐭𝐨𝐨𝐧 𝐦𝐞𝐦𝐨𝐫𝐢𝐞𝐬🎀",
  "𝐏𝐡𝐨𝐧𝐤 𝐬𝐨𝐧𝐠 𝐕𝐢𝐝𝐞𝐨🎀"        
         ];
-      const itemsPerPage = 10;
-      const page = parseInt(args[0]) || 1;
-      const totalPages = Math.ceil(displayNames.length / itemsPerPage);
-
-      if (page < 1 || page > totalPages) {
-        return api.sendMessage(`❌ Invalid page! Please choose between 1 - ${totalPages}.`, event.threadID, event.messageID);
+       const itemsPerPage = 10;
+       const page = parseInt(args[0]) || 1;
+       const totalPages = Math.ceil(displayNames.length / itemsPerPage);
+       if (page < 1 || page > totalPages) {
+       return api.sendMessage(`❌ Invalid page! Please choose between 1 - ${totalPages}.`, event.threadID, event.messageID);
       }
 
       const startIndex = (page - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const displayedCategories = displayNames.slice(startIndex, endIndex);
-
       const message = `𝐀𝐯𝐚𝐢𝐥𝐚𝐛𝐥𝐞 𝐀𝐥𝐛𝐮𝐦 𝐕𝐢𝐝𝐞𝐨\n` +
-        "𐙚━━━━━━━━━━━━━━━━━━━━━ᡣ𐭩\n" +
-        displayedCategories.map((option, index) => `${startIndex + index + 1}. ${option}`).join("\n") +
-        "\n𐙚━━━━━━━━━━━━━━━━━━━━━ᡣ𐭩" +
-        `\n♻ | 𝐏𝐚𝐠𝐞 [${page}/${totalPages}]<😘\nℹ | 𝐓𝐲𝐩𝐞 !album ${page + 1} - 𝐭𝐨 𝐬𝐞𝐞 𝐧𝐞𝐱𝐭 𝐩𝐚𝐠𝐞.`.repeat(page < totalPages);
+      "𐙚━━━━━━━━━━━━━━━━━━━━━ᡣ𐭩\n" +
+      displayedCategories.map((option, index) => `${startIndex + index + 1}. ${option}`).join("\n") +
+      "\n𐙚━━━━━━━━━━━━━━━━━━━━━ᡣ𐭩" +
+     `\n♻ | 𝐏𝐚𝐠𝐞 [${page}/${totalPages}]<😘\nℹ | 𝐓𝐲𝐩𝐞 !album ${page + 1} - 𝐭𝐨 𝐬𝐞𝐞 𝐧𝐞𝐱𝐭 𝐩𝐚𝐠𝐞.`.repeat(page < totalPages);
 
       await api.sendMessage(message, event.threadID, (error, info) => {
       global.GoatBot.onReply.set(info.messageID, {
@@ -163,7 +161,7 @@ module.exports = {
       startIndex,
       displayNames,
       realCategories: 
-[
+        [
   "funny",
   "islamic",
   "sad",
@@ -233,9 +231,7 @@ module.exports = {
   "childhood",
   "gamem",
   "cartoonm",
-  "phonk"        
-
-        
+  "phonk"                
 ],
         
  captions: [
@@ -309,73 +305,55 @@ module.exports = {
    "𝐇𝐞𝐫𝐞 𝐲𝐨𝐮𝐫 𝐆𝐚𝐦𝐞 𝐌𝐞𝐦𝐨𝐫𝐢𝐞𝐬 𝐕𝐢𝐝𝐞𝐨 𝐁𝐚𝐛𝐲 <🌟",
    "𝐇𝐞𝐫𝐞 𝐲𝐨𝐮𝐫 𝐂𝐚𝐫𝐭𝐨𝐨𝐧 𝐦𝐞𝐦𝐨𝐫𝐢𝐞𝐬 𝐕𝐢𝐝𝐞𝐨 𝐁𝐚𝐛𝐲 <🌟",
   "𝐇𝐞𝐫𝐞 𝐲𝐨𝐮𝐫 𝐏𝐡𝐨𝐧𝐤 𝐬𝐨𝐧𝐠 𝐕𝐢𝐝𝐞𝐨 𝐕𝐢𝐝𝐞𝐨 𝐕𝐢𝐝𝐞𝐨 𝐁𝐚𝐛𝐲 <🌟"
-
- 
- ]
+         ]
         });
       }, event.messageID);
     }
   },
 
   onReply: async function ({ api, event, Reply }) {
-    api.unsendMessage(Reply.messageID);
-
-    const reply = parseInt(event.body);
-    const index = reply - 1;
-
-    if (isNaN(reply) || index < 0 || index >= Reply.realCategories.length) {
+      api.unsendMessage(Reply.messageID);
+      const reply = parseInt(event.body);
+      const index = reply - 1;
+      if (isNaN(reply) || index < 0 || index >= Reply.realCategories.length) {
       return api.sendMessage("Please reply with a valid number from the list.", event.threadID, event.messageID);
     }
 
-    const category = Reply.realCategories[index];
-    const caption = Reply.captions[index];
-    const userID = event.senderID;
+      const category = Reply.realCategories[index];
+      const caption = Reply.captions[index];
+      const userID = event.senderID; try {
+      const apiUrl = await baseApiUrl();
+      const response = await axios.get(`${apiUrl}/api/album/videos/${category}?userID=${userID}`);
+      if (!response.data.success) {
+      return api.sendMessage(response.data.message, event.threadID, event.messageID);
+     }
 
-    try {
-    const apiUrl = await baseApiUrl();
-    const response = await axios.get(`${apiUrl}/api/album/videos/${category}?userID=${userID}`);
-
-    if (!response.data.success) {
-    return api.sendMessage(response.data.message, event.threadID, event.messageID);
-      }
-
-    const videoUrls = response.data.videos;
-    if (!videoUrls || videoUrls.length === 0) {
-    return api.sendMessage("❌ | 𝐍𝐨 𝐯𝐢𝐝𝐞𝐨𝐬 𝐟𝐨𝐮𝐧𝐝 𝐟𝐨𝐫 𝐭𝐡𝐢𝐬 𝐜𝐚𝐭𝐞𝐠𝐨𝐫𝐲.", event.threadID, event.messageID);
-      }
-
-    const randomVideoUrl = videoUrls[Math.floor(Math.random() * videoUrls.length)];
-    const filePath = path.join(__dirname, "temp_video.mp4");
-
-    const downloadFile = async (url, filePath) => {
-    const response = await axios({
-    url,
-    method: "GET",
-    responseType: "stream",
-    headers: { 'User-Agent': 'Mozilla/5.0' }
-        });
-
-    return new Promise((resolve, reject) => {
-    const writer = fs.createWriteStream(filePath);
-    response.data.pipe(writer);
-    writer.on("finish", resolve);
-    writer.on("error", reject);
+      const videoUrls = response.data.videos;
+      if (!videoUrls || videoUrls.length === 0) {
+      return api.sendMessage("❌ | 𝐍𝐨 𝐯𝐢𝐝𝐞𝐨𝐬 𝐟𝐨𝐮𝐧𝐝 𝐟𝐨𝐫 𝐭𝐡𝐢𝐬 𝐜𝐚𝐭𝐞𝐠𝐨𝐫𝐲.", event.threadID, event.messageID);  }
+      const randomVideoUrl = videoUrls[Math.floor(Math.random() * videoUrls.length)];
+      const filePath = path.join(__dirname, "temp_video.mp4");
+      const downloadFile = async (url, filePath) => {
+      const response = await axios({
+      url,
+      method: "GET",
+      responseType: "stream",
+      headers: { 'User-Agent': 'Mozilla/5.0' }
      });
+
+      return new Promise((resolve, reject) => {
+      const writer = fs.createWriteStream(filePath);
+      response.data.pipe(writer);
+      writer.on("finish", resolve);
+      writer.on("error", reject); });
     };
 
-   try {
-    await downloadFile(randomVideoUrl, filePath);
-    api.sendMessage(
-    { body: caption, attachment: fs.createReadStream(filePath) },
-    event.threadID,
-    () => fs.unlinkSync(filePath),
-    event.messageID
-   );
-  } catch (error) {
-    api.sendMessage("❌ | 𝐅𝐚𝐢𝐥𝐞𝐝 𝐭𝐨 𝐝𝐨𝐰𝐧𝐥𝐨𝐚𝐝 𝐭𝐡𝐞 𝐯𝐢𝐝𝐞𝐨.", event.threadID, event.messageID);
-      }
-  } catch (error) {
-    api.sendMessage("❌ | Error while fetching video URLs from the API. Please check the API or try again later.", event.threadID, event.messageID);
+    try {
+     await downloadFile(randomVideoUrl, filePath);
+     api.sendMessage(
+     { body: caption, attachment: fs.createReadStream(filePath) }, event.threadID, () => fs.unlinkSync(filePath), event.messageID);} catch (error) {
+    api.sendMessage("❌ | 𝐅𝐚𝐢𝐥𝐞𝐝 𝐭𝐨 𝐝𝐨𝐰𝐧𝐥𝐨𝐚𝐝 𝐭𝐡𝐞 𝐯𝐢𝐝𝐞𝐨.", event.threadID, event.messageID); }} catch (error) {
+    api.sendMessage("🥹error, contact MahMUD.", event.threadID, event.messageID);
     }
   }
 };
